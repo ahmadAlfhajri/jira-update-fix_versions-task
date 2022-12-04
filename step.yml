@@ -109,6 +109,22 @@ inputs:
         ex.: 15
       is_expand: true
       is_required: false
+  - label_title_jira:
+    opts:
+      title: " jira task title"
+      summary: "filter [Android] or [iOS] labels"
+      description: |
+        ex.: [Android]
+      is_expand: true
+      is_required: false
+  - fix_version_value:
+    opts:
+      title: " jira's field fix versions"
+      summary: "To fill in Jira's field named Fix Versions"
+      description: |
+        ex.: 0.79.0
+      is_expand: true
+      is_required: true
   - changelogpath:
     opts:
       title: " path to write changelogs "

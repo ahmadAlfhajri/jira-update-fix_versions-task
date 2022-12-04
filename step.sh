@@ -15,15 +15,18 @@ fi
 if [ -z "$from_status" ]; then
 	echo "Status of tasks for deployment is required."
 fi
+if [ -z "$label_title_jira" ]; then
+	echo "task label is required"
+fi
 
 length=${#jira_project_name}
 
 cred="$jira_user:$jira_token"
 
 token=`echo -n $cred | base64`
-echo "token $token"
+#echo "label $token"
 query=$(jq -n \
---arg jql "project = $jira_project_name AND status = '$from_status'" \
+--arg jql "project = $jira_project_name AND status = '$from_status' AND labels = $label_title_jira" \
 '{ jql: $jql, startAt: 0, maxResults: 200, fields: [ "id" ], fieldsByKeys: false }'
 );
 
@@ -65,6 +68,16 @@ do
 		jq -r '.fields.summary')    
 		change_log="$change_log"$'\n'"$task_title"
 	fi
+	if [ -n "$fix_version_value" ]; then
+		echo "Setting Fix Versions of $task to $fix_version_value"
+
+		curl -s \                    
+		-H "Content-Type: application/json" \
+		-H "Authorization: Basic $token" \
+		--request PUT \
+		--data '{"update":{"fixVersions":[{"add":{"name":"'$fix_version_value'"}}]}}' \
+		"$jira_url/rest/api/2/issue/$task"
+	fi
 	transition_id=$(curl -s \
 	-H "Authorization: Basic $token" \
 	"$jira_url/rest/api/2/issue/$task/transitions" |
@@ -94,7 +107,8 @@ jira_change_list=""
 for task in ${tasks_to_close}
 do
 	release_message="$release_message$jira_url/browse/$task\n"
-	jira_change_list="$jira_change_list$jira_url/browse/$task\n"
+	jira_change_list="$jira_change_list$jira_url/browse/$task
+"
 done
 release_message="$release_message\n\`\`\` "
 release_message="\"$release_message\""
