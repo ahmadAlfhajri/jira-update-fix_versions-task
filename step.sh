@@ -71,12 +71,13 @@ do
 	if [ -n "$fix_version_value" ]; then
 		echo "Setting Fix Versions of $task to $fix_version_value"
 
-		curl -s \                    
+		curl -s \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Basic $token" \
 		--request PUT \
 		--data '{"update":{"fixVersions":[{"add":{"name":"'$fix_version_value'"}}]}}' \
 		"$jira_url/rest/api/2/issue/$task"
+
 	fi
 	transition_id=$(curl -s \
 	-H "Authorization: Basic $token" \
